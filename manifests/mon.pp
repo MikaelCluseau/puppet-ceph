@@ -153,6 +153,8 @@ touch /etc/ceph/${cluster_name}.client.admin.keyring",
       ->
       service { $mon_service:
         ensure => running,
+        hasstatus => false,
+        pattern => "ceph-mon .* ${name}",
       }
 
 
