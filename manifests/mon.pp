@@ -102,11 +102,15 @@ define ceph::mon (
           fail("key (set to ${key}) and keyring (set to ${keyring}) are mutually exclusive")
         }
         if $key {
+          $admin_key = $::ceph::profile::params::admin_key
+          if ! $admin_key {
+            fail("monitor creation requires the admin key to be set.")
+          }
           $keyring_path = "/tmp/ceph-mon-keyring-${id}"
 
           file { $keyring_path:
             mode        => '0444',
-            content     => "[mon.]\n\tkey = ${key}\n\tcaps mon = \"allow *\"\n",
+            content     => "[mon.]\n\tkey = ${key}\n\tcaps mon = \"allow *\"\n[client.admin]\n\tkey = ${admin_key}\n\tcaps mon = \"allow *\"\n\tcaps osd = \"allow *\"\n",
           }
 
           File[$keyring_path] -> Exec[$ceph_mkfs]
