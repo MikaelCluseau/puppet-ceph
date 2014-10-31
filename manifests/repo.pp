@@ -30,6 +30,11 @@ class ceph::repo (
 ) {
   case $::osfamily {
     'Debian': {
+      if $::lsbdistcodename == 'jessie' {
+        $repo_dist = 'wheezy'
+      } else {
+        $repo_dist = $::lsbdistcodename
+      }
       include apt
 
       apt::key { 'ceph':
@@ -41,7 +46,7 @@ class ceph::repo (
       apt::source { 'ceph':
         ensure   => $ensure,
         location => "http://ceph.com/debian-${release}/",
-        release  => $::lsbdistcodename,
+        release  => $repo_dist,
         require  => Apt::Key['ceph'],
         tag      => 'ceph',
       }
@@ -51,7 +56,7 @@ class ceph::repo (
         apt::source { 'ceph-extras':
           ensure   => $ensure,
           location => 'http://ceph.com/packages/ceph-extras/debian/',
-          release  => $::lsbdistcodename,
+          release  => $repo_dist,
           require  => Apt::Key['ceph'],
         }
 
@@ -67,8 +72,8 @@ class ceph::repo (
 
         apt::source { 'ceph-fastcgi':
           ensure   => $ensure,
-          location => "http://gitbuilder.ceph.com/libapache-mod-fastcgi-deb-${::lsbdistcodename}-${::hardwaremodel}-basic/ref/master",
-          release  => $::lsbdistcodename,
+          location => "http://gitbuilder.ceph.com/libapache-mod-fastcgi-deb-${repo_dist}-${::hardwaremodel}-basic/ref/master",
+          release  => $repo_dist,
           require  => Apt::Key['ceph-gitbuilder'],
         }
 
